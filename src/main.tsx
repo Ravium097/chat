@@ -428,9 +428,10 @@ function WorkoutFields({
                   type="checkbox"
                   checked={s.completed}
                   onChange={async (ev) => {
-                    update({ completed: ev.target.checked });
+                    const completed = ev.target.checked;
+                    update({ completed });
                     const cfg = await db.settings.get("settings");
-                    if (ev.target.checked && w.status === "active" && cfg?.auto)
+                    if (completed && w.status === "active" && cfg?.auto)
                       await db.settings.update("settings", {
                         timerEnd:
                           Date.now() +

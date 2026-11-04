@@ -7,6 +7,7 @@ import {
   NavLink,
   useNavigate,
   useParams,
+  useLocation,
   Link,
 } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -68,6 +69,8 @@ const error = (e: unknown) =>
       : "Speichern fehlgeschlagen. Bitte Backup erstellen.",
   );
 function App() {
+  const { pathname } = useLocation();
+  useEffect(() => { document.querySelector("main")?.scrollTo(0, 0); }, [pathname]);
   const settings = useLiveQuery(() => db.settings.get("settings")) ?? defaults;
   const [now, tick] = useState(Date.now());
   useEffect(() => {
@@ -81,7 +84,7 @@ function App() {
       : null);
   return (
     <>
-      <main>
+      <main className={["/", "/training", "/history", "/stats"].includes(pathname) ? "overview" : ""}>
         <header>
           <Link to="/" className="logo">
             SET<span>●</span>
@@ -101,6 +104,7 @@ function App() {
           <Route path="/import" element={<Import />} />
         </Routes>
       </main>
+      <footer className="app-dock">
       {remaining !== null && (
         <aside className="timer">
           <strong>
@@ -157,6 +161,7 @@ function App() {
           );
         })}
       </nav>
+      </footer>
     </>
   );
 }
@@ -176,7 +181,7 @@ function Dashboard() {
         <br />
         <span>Dein Fortschritt.</span>
       </h1>
-      <p>Ein Satz nach dem anderen.</p>
+      <p className="dashboard-tagline">Ein Satz nach dem anderen.</p>
       <div className="metrics">
         <article>
           <b>{done.length}</b>
@@ -221,14 +226,7 @@ function Dashboard() {
           </p>
         </article>
       )}
-      <article className="note">
-        <small>DEIN TRAINING GEHÖRT DIR</small>
-        <p>
-          Lokal gespeichert. Ohne Account.
-          <br />
-          Bereit, wenn du es bist.
-        </p>
-      </article>
+
     </>
   );
 }
@@ -836,6 +834,7 @@ function Stats() {
       ? [{ date: w.date, weight: Math.max(...weights) }]
       : [];
   });
+  if (!filtered.length) return <><h1>Dein Fortschritt</h1><select aria-label="Zeitraum" value={range} onChange={e=>R(e.target.value)}><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">1 Jahr</option><option value="all">Gesamt</option></select><div className="metrics"><article><b>0</b><small>Workouts</small></article><article><b>0</b><small>Volumen · kg</small></article></div><article className="empty"><ChartNoAxesCombined size={32}/><h2>Noch keine Trainingsdaten</h2><p>Volumen, Häufigkeit, Kraftentwicklung und Rekorde erscheinen nach deinem ersten abgeschlossenen Workout im gewählten Zeitraum.</p><Link className="button primary" to="/training">Zum Training</Link></article></>;
   return (
     <>
       <h1>Dein Fortschritt</h1>

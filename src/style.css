@@ -350,3 +350,34 @@ input:focus-visible {
     animation: none !important;
   }
 }
+
+/* Only the content scrolls; the dock has its own reserved viewport row. */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+#root { position: fixed; inset: 0; height: 100dvh; display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }
+main { width: 100%; height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; padding: calc(12px + env(safe-area-inset-top)) 20px 16px; scroll-padding-block: 16px; }
+header { margin-bottom: 18px; min-height: 44px; }
+header > a:last-child { display: grid; place-items: center; width: 44px; height: 44px; }
+.app-dock { padding: 8px 16px calc(10px + env(safe-area-inset-bottom)); background: #f7f7f7; z-index: 10; }
+.app-dock nav, .app-dock .timer { position: static; transform: none; width: 100%; margin: 0 auto; }
+.app-dock .timer { margin-bottom: 10px; }
+.overview h1 { font-size: clamp(29px, 7vw, 36px); margin: 10px 0 12px; }
+.overview h2 { margin: 16px 0 10px; }
+.overview p { margin: 8px 0; }
+.overview .metrics { margin: 12px 0; }
+.overview .metrics article { margin: 0; padding: 14px 10px; }
+.overview .action { margin: 14px 0; padding: 15px; }
+.overview .empty { padding: 20px 16px; }
+.overview .empty svg { margin-bottom: 10px; }
+.overview article > h2:first-child { margin-top: 0; }
+@media (min-width: 768px) { .overview { max-width: 760px; } }
+@media (max-height: 740px) {
+  .overview header { margin-bottom: 6px; }
+  .overview .dashboard-tagline { display: none; }
+  .overview h1 { font-size: 28px; margin: 8px 0; }
+  .overview h2 { margin: 10px 0 8px; }
+  .overview p { font-size: 14px; line-height: 1.45; }
+  .overview article { margin-block: 8px; }
+  .overview .metrics article { margin: 0; padding-block: 10px; }
+  .overview .empty { padding-block: 12px; }
+  .overview .empty svg { margin-bottom: 4px; }
+}

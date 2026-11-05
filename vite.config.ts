@@ -27,18 +27,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,png,svg}"],
-        runtimeCaching: [
-          {
-            urlPattern:
-              /https:\/\/(cdn.jsdelivr.net|tessdata.projectnaptha.com)\//,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "ocr-resources",
-              expiration: { maxEntries: 30, maxAgeSeconds: 31536000 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
+
       },
     }),
   ],

@@ -5,6 +5,7 @@ import {
   Routes,
   Route,
   NavLink,
+  Navigate,
   useNavigate,
   useParams,
   useLocation,
@@ -57,7 +58,6 @@ import {
   type Item,
   type Exercise,
 } from "./data";
-import { recognize } from "./ocr";
 import "./style.css";
 const day = (d = new Date()) => format(d, "yyyy-MM-dd");
 const fmt = (n: number) =>
@@ -101,7 +101,7 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/import" element={<Import />} />
+          <Route path="/import" element={<Navigate to="/training" replace />} />
         </Routes>
       </main>
       <footer className="app-dock">
@@ -279,14 +279,9 @@ function Training() {
         <Plus />
         Freies Workout starten
       </button>
-      <div className="two">
-        <Link className="tile" to="/import">
-          Screenshot importieren <ArrowRight />
-        </Link>
-        <Link className="tile" to="/library">
-          Übungsbibliothek <Dumbbell />
-        </Link>
-      </div>
+      <Link className="tile" to="/library">
+        Übungsbibliothek <Dumbbell />
+      </Link>
       <h2>Deine Vorlagen</h2>
       {ws
         .filter((w) => w.status === "template")
@@ -1029,145 +1024,6 @@ function Settings() {
         <br />
         Auf dem iPhone: Safari → Teilen → Zum Home-Bildschirm.
       </p>
-    </>
-  );
-}
-function Import() {
-  const [files, F] = useState<File[]>([]),
-    [w, W] = useState<Workout | null>(null),
-    [status, S] = useState(""),
-    [warnings, A] = useState<string[]>([]),
-    [busy, B] = useState(false);
-  const nav = useNavigate();
-  return (
-    <>
-      <h1>Screenshot importieren</h1>
-      <p>1. Auswählen · 2. Erkennen · 3. Prüfen · 4. Speichern</p>
-      <article>
-        <p>
-          Lokale Erkennung auf deinem Gerät. Beim ersten Start werden
-          OCR-Sprachdateien geladen. Keine Bildübertragung.
-        </p>
-        <input
-          type="file"
-          multiple
-          accept="image/png,image/jpeg,image/webp"
-          disabled={busy}
-          onChange={(e) => {
-            const fs = Array.from(e.target.files ?? []);
-            if (
-              fs.some(
-                (f) =>
-                  !["image/png", "image/jpeg", "image/webp"].includes(f.type) ||
-                  f.size > 15 * 1024 * 1024,
-              ) ||
-              files.length + fs.length > 8
-            ) {
-              S(
-                "Maximal 8 PNG/JPEG/WebP-Dateien mit je 15 MB. HEIC bitte als JPEG exportieren.",
-              );
-              return;
-            }
-            F([...files, ...fs]);
-          }}
-        />
-        {files.map((f, i) => (
-          <div key={i}>
-            {f.name}
-            <button
-              disabled={busy || i === 0}
-              onClick={() => {
-                const a = [...files];
-                [a[i - 1], a[i]] = [a[i], a[i - 1]];
-                F(a);
-              }}
-            >
-              ↑
-            </button>
-            <button
-              disabled={busy}
-              onClick={() => F(files.filter((_, j) => j !== i))}
-            >
-              Entfernen
-            </button>
-          </div>
-        ))}
-        <button
-          className="primary"
-          disabled={!files.length || busy}
-          onClick={async () => {
-            B(true);
-            try {
-              const r = await recognize(files, S);
-              W(r.workout);
-              A(r.warnings);
-              S("Erkennung beendet. Bitte alle Werte prüfen.");
-            } catch (e) {
-              S(String(e));
-            } finally {
-              B(false);
-            }
-          }}
-        >
-          Lokal erkennen
-        </button>
-        <button
-          onClick={() =>
-            S(
-              "KI-Erkennung ist nicht konfiguriert. Die lokale Erkennung und manuelle Korrektur sind verfügbar.",
-            )
-          }
-        >
-          Mit KI genauer erkennen
-        </button>
-        <p role="status">{status}</p>
-      </article>
-      {w && (
-        <>
-          <article>
-            {warnings.map((x, i) => (
-              <p key={i}>ⓘ {x}</p>
-            ))}
-          </article>
-          <WorkoutFields w={w} save={W} />
-          <button
-            className="primary action"
-            disabled={
-              busy ||
-              !w.date ||
-              !w.name.trim() ||
-              w.exercises.some((e) => !e.name.trim())
-            }
-            onClick={async () => {
-              B(true);
-              try {
-                await db.transaction("rw", db.workouts, async () => {
-                  await db.workouts.add(w);
-                });
-                F([]);
-                W(null);
-                alert("Workout gespeichert.");
-                nav("/history");
-              } catch (e) {
-                error(e);
-                B(false);
-              }
-            }}
-          >
-            Workout speichern
-          </button>
-        </>
-      )}
-      <button
-        disabled={busy}
-        onClick={() => {
-          F([]);
-          W(null);
-          nav("/training");
-        }}
-      >
-        Import abbrechen
-      </button>
     </>
   );
 }

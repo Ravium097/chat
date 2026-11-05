@@ -10,7 +10,6 @@ import {
   restore,
   type Workout,
 } from "../data";
-import { parseOCR } from "../ocr";
 beforeEach(async () => {
   await db.workouts.clear();
   await db.exercises.clear();
@@ -66,14 +65,4 @@ it("preserves historical names when exercise is removed", async () => {
   await db.workouts.add(w);
   await db.exercises.clear();
   expect((await db.workouts.get(w.id))?.exercises[0].name).toBe("Bankdrücken");
-});
-it("parses decimal comma and pounds without inventing completion", () => {
-  const r = parseOCR("Bankdrücken\n1 20,5 kg x 10\nCurls\n1 100 lbs x 8");
-  expect(r.workout.exercises[0].sets[0].weight).toBe(20.5);
-  expect(r.workout.exercises[1].sets[0].weight).toBe(45.36);
-  expect(r.workout.exercises[0].sets[0].completed).toBe(false);
-  expect(r.workout.date).toBe("");
-});
-it("keeps missing values absent", () => {
-  expect(parseOCR("Bankdrücken").workout.exercises[0].sets).toEqual([]);
 });

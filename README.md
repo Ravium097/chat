@@ -68,3 +68,21 @@ Die Screenshot-Erkennung einschließlich lokaler OCR und KI-Schaltfläche wurde 
 Noch offen: echte Browser-/iPhone- und Offline-Abnahme, RTL-Interaktionstests, explizite PWA-Update-Oberfläche, durchschnittliche Trainingsdauer in Statistik und weitergehende Modularisierung. Die erste Datenbankversion hat noch keine spätere Migration zu testen.
 
 Diese Ausgabe ist ein funktionsfähiger Grundstand, keine vollständige Erfüllung der umfangreichen SET-Abnahmekriterien.
+
+## SET 2.0 – Visual Preview
+
+Die visuelle Überarbeitung liegt auf `feat/set-2-visual-identity`. Die Datenbank bleibt auf Version 1; vorhandene Trainings werden nicht migriert oder zurückgesetzt.
+
+Unter **Training → Deine Push- & Pull-Vorlagen** lassen sich die vom Nutzer bereitgestellten Pläne prüfen und mit einem Klick ergänzen (Push: 10 Übungen/29 Sätze, Pull: 8 Übungen/22 Sätze). Die Übernahme ist atomar und überschreibt keine vorhandenen Einträge. Erneutes Klicken erzeugt keine Duplikate. Körpergewicht ohne Zusatzgewicht bleibt `null`. Abweichende Satzpausen bei Tricep Pushdown und Bicep Curl stehen in den Übungsnotizen, da das bestehende Modell nur eine Pause pro Übung unterstützt. Hier verwendet der Timer weiterhin die eingestellte Standardpause.
+
+**Einstellungen → Auf Updates prüfen** prüft die veröffentlichte PWA. Neue Service Worker können alte Offline-Versionen ablösen; eine offene Trainingsansicht wird nicht automatisch neu geladen. „Update öffnen“ bzw. „Ansicht neu laden“ verlangt eine Bestätigung. Vorher die laufende Eingabe abschließen und auf „Gespeichert“ warten. Kein Löschen von Browserdaten erforderlich.
+
+Zusätzliche Browserprüfungen:
+
+```sh
+npx playwright install chromium
+npm run test:ui
+npm run test:pwa
+```
+
+Alternativ einen vorhandenen Chromium über `CHROMIUM_PATH=/usr/bin/chromium` auswählen. Die Skripte starten lokale Testserver und verwenden isolierte Browserprofile. `test:pwa` prüft den Wechsel von einer alten gecachten Version, Datenerhalt, Backup und Offline-Reload. Chromium-Tests ersetzen keine Prüfung auf einem echten iPhone/iPad mit Safari.

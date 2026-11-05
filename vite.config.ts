@@ -8,13 +8,14 @@ export default defineConfig({
     tailwind(),
     VitePWA({
       registerType: "prompt",
+      injectRegister: false,
       manifest: {
         name: "SET",
         short_name: "SET",
         display: "standalone",
         start_url: "/",
-        theme_color: "#F7F7F7",
-        background_color: "#F7F7F7",
+        theme_color: "#F5F5F2",
+        background_color: "#F5F5F2",
         icons: [
           { src: "/icons/192.png", sizes: "192x192", type: "image/png" },
           {
@@ -26,8 +27,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,png,svg}"],
-
+        skipWaiting: true,
+        clientsClaim: true,
+        globPatterns: ["**/*.{js,css,html,png,svg,woff2}"],
       },
     }),
   ],

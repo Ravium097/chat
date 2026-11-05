@@ -59,6 +59,9 @@ import {
   type Exercise,
 } from "./data";
 import "./style.css";
+import { Brand, PageTitle, SectionTitle } from "./components/ui/Identity";
+import { PersonalTemplates } from "./components/templates/PersonalTemplates";
+import { UpdateControl } from "./components/pwa/UpdateControl";
 const day = (d = new Date()) => format(d, "yyyy-MM-dd");
 const fmt = (n: number) =>
   n.toLocaleString("de-DE", { maximumFractionDigits: 1 });
@@ -87,12 +90,13 @@ function App() {
       <main className={["/", "/training", "/history", "/stats"].includes(pathname) ? "overview" : ""}>
         <header>
           <Link to="/" className="logo">
-            SET<span>●</span>
+            <Brand />
           </Link>
           <Link aria-label="Einstellungen" to="/settings">
             <Gear />
           </Link>
         </header>
+        <div className={pathname === "/settings" ? "update-panel" : "update-panel compact-update"}><UpdateControl compact={pathname !== "/settings"} /></div>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />} />
@@ -137,6 +141,7 @@ function App() {
             +30 s
           </button>
           <button
+            aria-label="Pause beenden"
             onClick={() =>
               db.settings.update("settings", { paused: null, timerEnd: null })
             }
@@ -145,7 +150,7 @@ function App() {
           </button>
         </aside>
       )}
-      <nav>
+      <nav aria-label="Hauptnavigation">
         {[
           [Home, "/", "Home"],
           [Dumbbell, "/training", "Training"],
@@ -176,11 +181,11 @@ function Dashboard() {
       <p className="eyebrow">
         {format(new Date(), "EEEE, d. MMMM", { locale: de })}
       </p>
-      <h1>
+      <PageTitle>
         Dein Training.
         <br />
         <span>Dein Fortschritt.</span>
-      </h1>
+      </PageTitle>
       <p className="dashboard-tagline">Ein Satz nach dem anderen.</p>
       <div className="metrics">
         <article>
@@ -212,7 +217,7 @@ function Dashboard() {
         {active ? "Workout fortsetzen" : "Workout starten"}
         <ArrowRight />
       </Link>
-      <h2>Letztes Workout</h2>
+      <SectionTitle>Letztes Workout</SectionTitle>
       {done[0] ? (
         <WorkoutCard w={done[0]} />
       ) : (
@@ -232,7 +237,7 @@ function Dashboard() {
 }
 function WorkoutCard({ w }: { w: Workout }) {
   return (
-    <Link to={`/workout/${w.id}`}>
+    <Link to={`/workout/${w.id}`} aria-label={`${w.name} · ${w.date}`}>
       <article>
         <small>{w.date}</small>
         <h3>{w.name}</h3>
@@ -274,7 +279,7 @@ function Training() {
   return (
     <>
       <p className="eyebrow">ZEIT FÜR DICH</p>
-      <h1>Training</h1>
+      <PageTitle>Training</PageTitle>
       <button className="primary action" onClick={() => start().catch(error)}>
         <Plus />
         Freies Workout starten
@@ -282,7 +287,8 @@ function Training() {
       <Link className="tile" to="/library">
         Übungsbibliothek <Dumbbell />
       </Link>
-      <h2>Deine Vorlagen</h2>
+      <SectionTitle>Deine Vorlagen</SectionTitle>
+      <PersonalTemplates />
       {ws
         .filter((w) => w.status === "template")
         .map((w) => (
@@ -523,13 +529,13 @@ function Editor() {
   };
   return (
     <>
-      <h1>
+      <PageTitle>
         {w.status === "template"
           ? "Vorlage"
           : w.status === "active"
             ? "Im Training"
             : "Workout"}
-      </h1>
+      </PageTitle>
       <p>
         {count(w)} abgeschlossene Sätze · {fmt(volume(w))} kg ·{" "}
         {w.started && w.status === "active"
@@ -592,7 +598,7 @@ function Library() {
   const [edit, Edit] = useState<Exercise | null>(null);
   return (
     <>
-      <h1>Übungen</h1>
+      <PageTitle>Übungen</PageTitle>
       <input
         placeholder="Übung suchen"
         value={q}
@@ -631,7 +637,7 @@ function Library() {
       </button>
       {edit && (
         <article>
-          <h2>Übung bearbeiten</h2>
+          <SectionTitle>Übung bearbeiten</SectionTitle>
           <input
             aria-label="Name"
             value={edit.name}
@@ -743,7 +749,7 @@ function History() {
   });
   return (
     <>
-      <h1>Verlauf</h1>
+      <PageTitle>Verlauf</PageTitle>
       <article>
         <div className="row">
           <button onClick={() => Month(addMonths(month, -1))}>←</button>
@@ -766,11 +772,11 @@ function History() {
           ))}
         </div>
       </article>
-      <h2>
+      <SectionTitle>
         {format(new Date(selected + "T12:00:00"), "d. MMMM yyyy", {
           locale: de,
         })}
-      </h2>
+      </SectionTitle>
       {ws
         .filter((w) => w.date === selected)
         .map((w) => (
@@ -830,10 +836,10 @@ function Stats() {
       ? [{ date: w.date, weight: Math.max(...weights) }]
       : [];
   });
-  if (!filtered.length) return <><h1>Dein Fortschritt</h1><select aria-label="Zeitraum" value={range} onChange={e=>R(e.target.value)}><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">1 Jahr</option><option value="all">Gesamt</option></select><div className="metrics"><article><b>0</b><small>Workouts</small></article><article><b>0</b><small>Volumen · kg</small></article></div><article className="empty"><ChartNoAxesCombined size={32}/><h2>Noch keine Trainingsdaten</h2><p>Volumen, Häufigkeit, Kraftentwicklung und Rekorde erscheinen nach deinem ersten abgeschlossenen Workout im gewählten Zeitraum.</p><Link className="button primary" to="/training">Zum Training</Link></article></>;
+  if (!filtered.length) return <><PageTitle>Dein Fortschritt</PageTitle><select aria-label="Zeitraum" value={range} onChange={e=>R(e.target.value)}><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">1 Jahr</option><option value="all">Gesamt</option></select><div className="metrics"><article><b>0</b><small>Workouts</small></article><article><b>0</b><small>Volumen · kg</small></article></div><article className="empty"><ChartNoAxesCombined size={32}/><SectionTitle>Noch keine Trainingsdaten</SectionTitle><p>Volumen, Häufigkeit, Kraftentwicklung und Rekorde erscheinen nach deinem ersten abgeschlossenen Workout im gewählten Zeitraum.</p><Link className="button primary" to="/training">Zum Training</Link></article></>;
   return (
     <>
-      <h1>Dein Fortschritt</h1>
+      <PageTitle>Dein Fortschritt</PageTitle>
       <select value={range} onChange={(e) => R(e.target.value)}>
         <option value="30">30 Tage</option>
         <option value="90">90 Tage</option>
@@ -856,9 +862,9 @@ function Stats() {
       </select>
       {(["volume", "workouts"] as const).map((key) => (
         <article key={key}>
-          <h2>
+          <SectionTitle>
             {key === "volume" ? "Trainingsvolumen" : "Trainingshäufigkeit"}
-          </h2>
+          </SectionTitle>
           {groups.size ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[...groups.values()]}>
@@ -874,7 +880,7 @@ function Stats() {
         </article>
       ))}
       <article>
-        <h2>Kraftentwicklung</h2>
+        <SectionTitle>Kraftentwicklung</SectionTitle>
         <select value={selected ?? ""} onChange={(e) => E(e.target.value)}>
           {names.map((n) => (
             <option key={n}>{n}</option>
@@ -911,9 +917,9 @@ function Settings() {
   const s = useLiveQuery(() => db.settings.get("settings")) ?? defaults;
   return (
     <>
-      <h1>Einstellungen</h1>
+      <PageTitle>Einstellungen</PageTitle>
       <article>
-        <h2>Pausentimer</h2>
+        <SectionTitle>Pausentimer</SectionTitle>
         <label>
           Standardpause · Sekunden
           <input
@@ -944,7 +950,7 @@ function Settings() {
         </p>
       </article>
       <article>
-        <h2>Daten & Backup</h2>
+        <SectionTitle>Daten & Backup</SectionTitle>
         <button
           className="primary"
           onClick={async () => {
@@ -1020,7 +1026,7 @@ function Settings() {
         </button>
       </article>
       <p>
-        SET · Version 1.0.0
+        SET · Visual Preview
         <br />
         Auf dem iPhone: Safari → Teilen → Zum Home-Bildschirm.
       </p>

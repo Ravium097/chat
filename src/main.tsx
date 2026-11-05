@@ -59,7 +59,6 @@ import {
   type Exercise,
 } from "./data";
 import "./style.css";
-import { Brand, PageTitle, SectionTitle } from "./components/ui/Identity";
 import { PersonalTemplates } from "./components/templates/PersonalTemplates";
 import { UpdateControl } from "./components/pwa/UpdateControl";
 const day = (d = new Date()) => format(d, "yyyy-MM-dd");
@@ -90,7 +89,7 @@ function App() {
       <main className={["/", "/training", "/history", "/stats"].includes(pathname) ? "overview" : ""}>
         <header>
           <Link to="/" className="logo">
-            <Brand />
+            SET<span>●</span>
           </Link>
           <Link aria-label="Einstellungen" to="/settings">
             <Gear />
@@ -181,11 +180,11 @@ function Dashboard() {
       <p className="eyebrow">
         {format(new Date(), "EEEE, d. MMMM", { locale: de })}
       </p>
-      <PageTitle>
+      <h1>
         Dein Training.
         <br />
         <span>Dein Fortschritt.</span>
-      </PageTitle>
+      </h1>
       <p className="dashboard-tagline">Ein Satz nach dem anderen.</p>
       <div className="metrics">
         <article>
@@ -217,7 +216,7 @@ function Dashboard() {
         {active ? "Workout fortsetzen" : "Workout starten"}
         <ArrowRight />
       </Link>
-      <SectionTitle>Letztes Workout</SectionTitle>
+      <h2>Letztes Workout</h2>
       {done[0] ? (
         <WorkoutCard w={done[0]} />
       ) : (
@@ -279,7 +278,7 @@ function Training() {
   return (
     <>
       <p className="eyebrow">ZEIT FÜR DICH</p>
-      <PageTitle>Training</PageTitle>
+      <h1>Training</h1>
       <button className="primary action" onClick={() => start().catch(error)}>
         <Plus />
         Freies Workout starten
@@ -287,7 +286,7 @@ function Training() {
       <Link className="tile" to="/library">
         Übungsbibliothek <Dumbbell />
       </Link>
-      <SectionTitle>Deine Vorlagen</SectionTitle>
+      <h2>Deine Vorlagen</h2>
       <PersonalTemplates />
       {ws
         .filter((w) => w.status === "template")
@@ -529,13 +528,13 @@ function Editor() {
   };
   return (
     <>
-      <PageTitle>
+      <h1>
         {w.status === "template"
           ? "Vorlage"
           : w.status === "active"
             ? "Im Training"
             : "Workout"}
-      </PageTitle>
+      </h1>
       <p>
         {count(w)} abgeschlossene Sätze · {fmt(volume(w))} kg ·{" "}
         {w.started && w.status === "active"
@@ -598,7 +597,7 @@ function Library() {
   const [edit, Edit] = useState<Exercise | null>(null);
   return (
     <>
-      <PageTitle>Übungen</PageTitle>
+      <h1>Übungen</h1>
       <input
         placeholder="Übung suchen"
         value={q}
@@ -637,7 +636,7 @@ function Library() {
       </button>
       {edit && (
         <article>
-          <SectionTitle>Übung bearbeiten</SectionTitle>
+          <h2>Übung bearbeiten</h2>
           <input
             aria-label="Name"
             value={edit.name}
@@ -749,7 +748,7 @@ function History() {
   });
   return (
     <>
-      <PageTitle>Verlauf</PageTitle>
+      <h1>Verlauf</h1>
       <article>
         <div className="row">
           <button onClick={() => Month(addMonths(month, -1))}>←</button>
@@ -772,11 +771,11 @@ function History() {
           ))}
         </div>
       </article>
-      <SectionTitle>
+      <h2>
         {format(new Date(selected + "T12:00:00"), "d. MMMM yyyy", {
           locale: de,
         })}
-      </SectionTitle>
+      </h2>
       {ws
         .filter((w) => w.date === selected)
         .map((w) => (
@@ -836,10 +835,10 @@ function Stats() {
       ? [{ date: w.date, weight: Math.max(...weights) }]
       : [];
   });
-  if (!filtered.length) return <><PageTitle>Dein Fortschritt</PageTitle><select aria-label="Zeitraum" value={range} onChange={e=>R(e.target.value)}><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">1 Jahr</option><option value="all">Gesamt</option></select><div className="metrics"><article><b>0</b><small>Workouts</small></article><article><b>0</b><small>Volumen · kg</small></article></div><article className="empty"><ChartNoAxesCombined size={32}/><SectionTitle>Noch keine Trainingsdaten</SectionTitle><p>Volumen, Häufigkeit, Kraftentwicklung und Rekorde erscheinen nach deinem ersten abgeschlossenen Workout im gewählten Zeitraum.</p><Link className="button primary" to="/training">Zum Training</Link></article></>;
+  if (!filtered.length) return <><h1>Dein Fortschritt</h1><select aria-label="Zeitraum" value={range} onChange={e=>R(e.target.value)}><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">1 Jahr</option><option value="all">Gesamt</option></select><div className="metrics"><article><b>0</b><small>Workouts</small></article><article><b>0</b><small>Volumen · kg</small></article></div><article className="empty"><ChartNoAxesCombined size={32}/><h2>Noch keine Trainingsdaten</h2><p>Volumen, Häufigkeit, Kraftentwicklung und Rekorde erscheinen nach deinem ersten abgeschlossenen Workout im gewählten Zeitraum.</p><Link className="button primary" to="/training">Zum Training</Link></article></>;
   return (
     <>
-      <PageTitle>Dein Fortschritt</PageTitle>
+      <h1>Dein Fortschritt</h1>
       <select value={range} onChange={(e) => R(e.target.value)}>
         <option value="30">30 Tage</option>
         <option value="90">90 Tage</option>
@@ -862,9 +861,9 @@ function Stats() {
       </select>
       {(["volume", "workouts"] as const).map((key) => (
         <article key={key}>
-          <SectionTitle>
+          <h2>
             {key === "volume" ? "Trainingsvolumen" : "Trainingshäufigkeit"}
-          </SectionTitle>
+          </h2>
           {groups.size ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={[...groups.values()]}>
@@ -880,7 +879,7 @@ function Stats() {
         </article>
       ))}
       <article>
-        <SectionTitle>Kraftentwicklung</SectionTitle>
+        <h2>Kraftentwicklung</h2>
         <select value={selected ?? ""} onChange={(e) => E(e.target.value)}>
           {names.map((n) => (
             <option key={n}>{n}</option>
@@ -917,9 +916,9 @@ function Settings() {
   const s = useLiveQuery(() => db.settings.get("settings")) ?? defaults;
   return (
     <>
-      <PageTitle>Einstellungen</PageTitle>
+      <h1>Einstellungen</h1>
       <article>
-        <SectionTitle>Pausentimer</SectionTitle>
+        <h2>Pausentimer</h2>
         <label>
           Standardpause · Sekunden
           <input
@@ -950,7 +949,7 @@ function Settings() {
         </p>
       </article>
       <article>
-        <SectionTitle>Daten & Backup</SectionTitle>
+        <h2>Daten & Backup</h2>
         <button
           className="primary"
           onClick={async () => {
@@ -1026,7 +1025,7 @@ function Settings() {
         </button>
       </article>
       <p>
-        SET · Visual Preview
+        SET · Classic UI
         <br />
         Auf dem iPhone: Safari → Teilen → Zum Home-Bildschirm.
       </p>

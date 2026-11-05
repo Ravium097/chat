@@ -86,3 +86,7 @@ npm run test:pwa
 ```
 
 Alternativ einen vorhandenen Chromium über `CHROMIUM_PATH=/usr/bin/chromium` auswählen. Die Skripte starten lokale Testserver und verwenden isolierte Browserprofile. `test:pwa` prüft den Wechsel von einer alten gecachten Version, Datenerhalt, Backup und Offline-Reload. Chromium-Tests ersetzen keine Prüfung auf einem echten iPhone/iPad mit Safari.
+
+### Aktueller Designstand: Classic UI
+
+Auf Nutzerwunsch ist das ursprüngliche Clean-Light-Kartendesign wieder aktiv (Versionsanzeige: `Classic UI · 02`). Die Push-/Pull-Vorlagen, sichere additive Übernahme, Update-Korrektur und feste Navigation bleiben erhalten. Der Abschnitt „Visual Preview“ beschreibt die vorherige Gestaltungsphase; an Datenmodell und Trainingswerten wurde bei der Rückkehr nichts geändert.

@@ -14,8 +14,8 @@ export default defineConfig({
         short_name: "SET",
         display: "standalone",
         start_url: "/",
-        theme_color: "#F5F5F2",
-        background_color: "#F5F5F2",
+        theme_color: "#F7F7F7",
+        background_color: "#F7F7F7",
         icons: [
           { src: "/icons/192.png", sizes: "192x192", type: "image/png" },
           {
